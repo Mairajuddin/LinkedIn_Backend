@@ -24,6 +24,7 @@ import {
   addExperience,
   addCertification,
   addEducation,
+  getUserReport,
 } from "../controllers/user.controller.js";
 import multer from "multer";
 import path from "path";
@@ -52,5 +53,13 @@ router.post(
 
 router.post("/add-experience", protectRoute, addExperience);
 router.post("/add-education", protectRoute, addEducation);
+router.post(
+  "/my-report",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["user"]);
+  },
+  getUserReport
+);
+// GET METHOD IS NOT WORKING BUT BY USING POST REPORT GET SUCCESSFULLY WILL CHECK THIS ISSUE IN THE END HASSSAN BETA
 
 export default router;

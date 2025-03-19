@@ -3,6 +3,7 @@ import {
   approveCertification,
   getAllUsers,
   getPendingCertifications,
+  getUserReportByAdmin,
 } from "../controllers/adminController.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -31,5 +32,12 @@ adminRouter.put(
   },
   approveCertification
 );
-
+adminRouter.get(
+  "/user-report/:userId",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["admin"]);
+  },
+  getUserReportByAdmin
+);
+// getUserReportByAdmin
 export default adminRouter;

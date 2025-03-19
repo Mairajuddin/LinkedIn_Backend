@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import mongoose from "mongoose";
+import Post from "../models/post.model.js";
 
 export const getSuggestedConnections = async (req, res) => {
   try {
@@ -170,7 +171,6 @@ export const addEducation = async (req, res) => {
   try {
     const { school, fieldOfStudy, startYear, endYear } = req.body;
 
-    // Validate required fields
     if (!school || !fieldOfStudy || !startYear) {
       return res.status(400).json({
         success: false,
@@ -214,5 +214,43 @@ export const addEducation = async (req, res) => {
   } catch (error) {
     console.error("Error in addEducation:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const getUserReport = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log(userId, "UUSSSEERRR-IIDD");
+
+    const totalPosts = await Post.countDocuments({ author: userId });
+
+    const userPosts = await Post.find({ author: userId });
+    const totalComments = userPosts.reduce(
+      (sum, post) => sum + post.comments.length,
+      0
+    );
+
+    const totalShares = await Post.countDocuments({
+      sharedPost: { $ne: null },
+      author: userId,
+    });
+
+    const totalLikes = userPosts.reduce(
+      (sum, post) => sum + post.likes.length,
+      0
+    );
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalPosts,
+        totalComments,
+        totalShares,
+        totalLikes,
+      },
+    });
+  } catch (error) {
+    console.error("Error in getUserReport controller:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

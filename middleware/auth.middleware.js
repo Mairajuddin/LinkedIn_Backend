@@ -5,10 +5,10 @@ import { JWT_SECRET } from "../Configurations/config.js";
 
 export const protectRoute = async (req, res, next, roles = []) => {
   try {
-    console.log("===== Incoming Request =====");
-    console.log("Request Method:", req.method);
-    console.log("Received Headers:", req.headers);
-    console.log("Received Cookies:", req.cookies);
+    // console.log("===== Incoming Request =====");
+    // console.log("Request Method:", req.method);
+    // console.log("Received Headers:", req.headers);
+    // console.log("Received Cookies:", req.cookies);
     const token = req.cookies["jwt-linkedin"];
 
     if (!token) {
