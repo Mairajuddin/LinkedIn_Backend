@@ -8,13 +8,10 @@ import {
 
 const router = express.Router();
 
-// ✅ Get all events
-router.get("/", protectRoute, getAllEvents);
+router.post("/", protectRoute, getAllEvents); //post sy get kia hy
 
-// ✅ Create a new event (only "admin" or "head" users allowed)
 router.post("/create", protectRoute, createEvent);
 
-// ✅ Delete an event (admin can delete any, user can delete only own)
 router.delete("/delete/:id", protectRoute, deleteEvent);
 
 export default router;
