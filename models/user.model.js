@@ -1,79 +1,3 @@
-// import mongoose from "mongoose";
-
-// const userSchema = new mongoose.Schema(
-//   {
-//     name: {
-//       type: String,
-//       required: true,
-//     },
-//     username: { type: String, required: true, unique: true },
-//     email: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     role: { type: String, enum: ["admin", "user"], default: "user" },
-
-//     profilePicture: {
-//       type: String,
-//       default: "",
-//     },
-//     bannerImg: {
-//       type: String,
-//       default: "",
-//     },
-//     headline: {
-//       type: String,
-//       default: "Linkedin User",
-//     },
-//     location: {
-//       type: String,
-//       default: "Earth",
-//     },
-//     about: {
-//       type: String,
-//       default: "",
-//     },
-//     skills: [String],
-//     experience: [
-//       {
-//         title: String,
-//         company: String,
-//         startDate: Date,
-//         endDate: Date,
-//         description: String,
-//       },
-//     ],
-//     education: [
-//       {
-//         school: String,
-//         fieldOfStudy: String,
-//         startYear: Number,
-//         endYear: Number,
-//       },
-//     ],
-//     certifications: [
-//       {
-//         title: String,
-//         institute: String,
-//         startDate: Date,
-//         endDate: Date,
-//         description: String,
-//         file: String, // Store file URL or path
-//       },
-//     ],
-//     isVerified: { type: Boolean, default: false }, // User verification status
-
-//     connections: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "User",
-//       },
-//     ],
-//   },
-//   { timestamps: true }
-// );
-
-// const User = mongoose.model("User", userSchema);
-
-// export default User;
 import mongoose from "mongoose";
 
 const experienceSchema = new mongoose.Schema({
@@ -104,6 +28,40 @@ const educationSchema = new mongoose.Schema({
   endYear: { type: Number },
 });
 
+// const userSchema = new mongoose.Schema(
+//   {
+//     name: { type: String, required: true },
+//     username: { type: String, required: true, unique: true },
+//     email: { type: String, required: true, unique: true },
+//     password: { type: String, required: true },
+//     role: { type: String, enum: ["admin", "user"], default: "user" },
+
+//     profilePicture: { type: String, default: "" },
+//     bannerImg: { type: String, default: "" },
+//     headline: { type: String, default: "Linkedin User" },
+//     location: { type: String, default: "Earth" },
+//     about: { type: String, default: "" },
+//     skills: [String],
+
+//     experience: [experienceSchema],
+//     education: [educationSchema],
+//     certifications: [certificationSchema],
+
+//     isVerified: { type: Boolean, default: false },
+
+//     connections: [
+//       {
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: "User",
+//       },
+//     ],
+//   },
+//   { timestamps: true }
+// );
+
+// const User = mongoose.model("User", userSchema);
+
+// export default User;
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -111,6 +69,15 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ["admin", "user"], default: "user" },
+
+    userType: {
+      type: String,
+      enum: ["regular", "head"],
+      default: "regular",
+      required: function () {
+        return this.role === "user";
+      }, // 🟢 Only applies to "user"
+    },
 
     profilePicture: { type: String, default: "" },
     bannerImg: { type: String, default: "" },
@@ -134,7 +101,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 const User = mongoose.model("User", userSchema);
 
 export default User;

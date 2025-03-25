@@ -110,3 +110,26 @@ export const getUserReportByAdmin = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const assignHeadUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.role !== "user") {
+      return res
+        .status(400)
+        .json({ message: "Only users can be assigned as head users" });
+    }
+
+    user.userType = "head";
+    await user.save();
+
+    res.json({ success: true, message: "User assigned as head user", user });
+  } catch (error) {
+    console.error("Error assigning head user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

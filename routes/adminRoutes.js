@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   approveCertification,
+  assignHeadUser,
   getAllUsers,
   getPendingCertifications,
   getUserReportByAdmin,
@@ -39,5 +40,13 @@ adminRouter.get(
   },
   getUserReportByAdmin
 );
+adminRouter.put(
+  "/assign-head/:userId",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["admin"]);
+  },
+  assignHeadUser
+);
+
 // getUserReportByAdmin
 export default adminRouter;
