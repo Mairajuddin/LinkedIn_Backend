@@ -4,7 +4,7 @@ import { sendMessage, getMessages } from "../controllers/messageController.js";
 
 const router = express.Router();
 
-router.post("/", protectRoute, sendMessage); // ✅ POST for sending a message
-router.get("/:chatId", protectRoute, getMessages); // ✅ GET for fetching messages
+router.post("/", protectRoute, sendMessage);
+router.get("/:chatId", protectRoute, getMessages);
 
-export default router; // ✅ Correct export
+export default router;

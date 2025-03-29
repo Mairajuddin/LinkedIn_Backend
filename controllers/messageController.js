@@ -88,6 +88,7 @@ export const getMessages = asyncHandler(async (req, res) => {
       .populate("sender", "username email profilePicture") // Populate sender details
       .sort({ createdAt: 1 }); // Sort in ascending order to maintain conversation flow
 
+    console.log(messages, "sssssssssss");
     // Reset unread count for this user in the chat
     await Chat.findByIdAndUpdate(chatId, {
       $set: { [`unreadCount.${req.user._id}`]: 0 },

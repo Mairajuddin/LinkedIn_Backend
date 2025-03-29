@@ -4,7 +4,7 @@ import { accessChat, fetchChats } from "../controllers/chatController.js";
 
 const router = express.Router();
 
-router.post("/", protectRoute, accessChat); // ✅ POST for creating/accessing a chat
-router.get("/", protectRoute, fetchChats); // ✅ GET for fetching user's chats
+router.post("/", protectRoute, accessChat);
+router.get("/", protectRoute, fetchChats);
 
-export default router; // ✅ Correct Export
+export default router;

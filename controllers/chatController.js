@@ -14,7 +14,9 @@ export const accessChat = asyncHandler(async (req, res) => {
   let chat = await Chat.find({
     participants: { $all: [req.user._id, userId] },
   })
-    .populate("participants", "-password")
+    // .populate("participants", "-password")
+    .populate("participants", "name username profilePicture") // 👈 Only required fields
+
     .populate("latestMessage");
 
   chat = await User.populate(chat, {
@@ -47,7 +49,8 @@ export const accessChat = asyncHandler(async (req, res) => {
 export const fetchChats = asyncHandler(async (req, res) => {
   try {
     let chats = await Chat.find({ participants: req.user._id })
-      .populate("participants", "-password")
+      .populate("participants", "name username profilePicture") // 👈 Only required fields
+
       .populate("latestMessage")
       .sort({ updatedAt: -1 });
 
