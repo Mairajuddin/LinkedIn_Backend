@@ -25,6 +25,13 @@ import {
   addCertification,
   addEducation,
   getUserReport,
+  updateCertification,
+  updateExperience,
+  updateEducation,
+  getSkills,
+  addSkill,
+  updateSkill,
+  deleteSkill,
 } from "../controllers/user.controller.js";
 import multer from "multer";
 import path from "path";
@@ -53,6 +60,14 @@ router.post(
 
 router.post("/add-experience", protectRoute, addExperience);
 router.post("/add-education", protectRoute, addEducation);
+router.put("/update-certification", protectRoute, updateCertification);
+router.put("/update-experience", protectRoute, updateExperience);
+router.put("/update-education", protectRoute, updateEducation);
+router.get("/skills", protectRoute, getSkills); // ✅ Get all skills
+router.post("/skills", protectRoute, addSkill); // ✅ Add a skill
+router.put("/skills", protectRoute, updateSkill); // ✅ Update a skill
+router.delete("/skills", protectRoute, deleteSkill); // ✅ Delete a skill
+
 router.post(
   "/my-report",
   (req, res, next) => {

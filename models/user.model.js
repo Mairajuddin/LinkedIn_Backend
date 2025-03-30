@@ -28,40 +28,6 @@ const educationSchema = new mongoose.Schema({
   endYear: { type: Number },
 });
 
-// const userSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true },
-//     username: { type: String, required: true, unique: true },
-//     email: { type: String, required: true, unique: true },
-//     password: { type: String, required: true },
-//     role: { type: String, enum: ["admin", "user"], default: "user" },
-
-//     profilePicture: { type: String, default: "" },
-//     bannerImg: { type: String, default: "" },
-//     headline: { type: String, default: "Linkedin User" },
-//     location: { type: String, default: "Earth" },
-//     about: { type: String, default: "" },
-//     skills: [String],
-
-//     experience: [experienceSchema],
-//     education: [educationSchema],
-//     certifications: [certificationSchema],
-
-//     isVerified: { type: Boolean, default: false },
-
-//     connections: [
-//       {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "User",
-//       },
-//     ],
-//   },
-//   { timestamps: true }
-// );
-
-// const User = mongoose.model("User", userSchema);
-
-// export default User;
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },

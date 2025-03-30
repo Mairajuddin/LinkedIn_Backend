@@ -4,6 +4,7 @@ import Notification from "../models/notification.model.js";
 import { sendCommentNotificationEmail } from "../emails/emailHandlers.js";
 
 export const getFeedPosts = async (req, res) => {
+  console.log("hello sssssssssssssssssss");
   try {
     const posts = await Post.find({
       author: { $in: [...req.user.connections, req.user._id] },

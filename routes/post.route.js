@@ -21,6 +21,6 @@ router.post("/:id/comment", protectRoute, createComment);
 router.put("/:postId/comments/:commentId", protectRoute, updateComment);
 
 router.post("/:id/like", protectRoute, likePost);
-router.post("/:postId/share", protectRoute, sharePost); // ✅ Share Post Route
+router.post("/:postId/share", protectRoute, sharePost);
 
 export default router;

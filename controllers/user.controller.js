@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import mongoose from "mongoose";
 import Post from "../models/post.model.js";
+import Event from "../models/eventModel.js";
 
 export const getSuggestedConnections = async (req, res) => {
   try {
@@ -216,7 +217,232 @@ export const addEducation = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// ------------------------------------------------------------
+export const updateCertification = async (req, res) => {
+  try {
+    const { certId, title, institute, startDate, endDate, description } =
+      req.body;
 
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const certification = user.certifications.id(certId);
+    if (!certification) {
+      return res.status(404).json({ message: "Certification not found" });
+    }
+
+    certification.title = title || certification.title;
+    certification.institute = institute || certification.institute;
+    certification.startDate = startDate || certification.startDate;
+    certification.endDate = endDate || certification.endDate;
+    certification.description = description || certification.description;
+
+    await user.save();
+    res.json({ success: true, data: user.certifications });
+  } catch (error) {
+    console.error("Error in updateCertification:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const updateExperience = async (req, res) => {
+  try {
+    const { expId, title, company, startDate, endDate, description } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const experience = user.experience.id(expId);
+    if (!experience) {
+      return res.status(404).json({ message: "Experience not found" });
+    }
+
+    experience.title = title || experience.title;
+    experience.company = company || experience.company;
+    experience.startDate = startDate || experience.startDate;
+    experience.endDate = endDate || experience.endDate;
+    experience.description = description || experience.description;
+
+    await user.save();
+    res.json({ success: true, data: user.experience });
+  } catch (error) {
+    console.error("Error in updateExperience:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const updateEducation = async (req, res) => {
+  try {
+    const { eduId, school, fieldOfStudy, startYear, endYear } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const education = user.education.id(eduId);
+    if (!education) {
+      return res.status(404).json({ message: "Education not found" });
+    }
+
+    education.school = school || education.school;
+    education.fieldOfStudy = fieldOfStudy || education.fieldOfStudy;
+    education.startYear = startYear || education.startYear;
+    education.endYear = endYear || education.endYear;
+
+    await user.save();
+    res.json({ success: true, data: user.education });
+  } catch (error) {
+    console.error("Error in updateEducation:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Get Skills
+export const getSkills = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("skills");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ success: true, data: user.skills });
+  } catch (error) {
+    console.error("Error in getSkills:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Add a Skill
+export const addSkill = async (req, res) => {
+  try {
+    const { skill } = req.body;
+
+    if (!skill) {
+      return res.status(400).json({ message: "Skill is required." });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.skills.includes(skill)) {
+      return res.status(400).json({ message: "Skill already exists." });
+    }
+
+    user.skills.push(skill);
+    await user.save();
+
+    res.json({ success: true, data: user.skills });
+  } catch (error) {
+    console.error("Error in addSkill:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Update a Skill
+export const updateSkill = async (req, res) => {
+  try {
+    const { oldSkill, newSkill } = req.body;
+
+    if (!oldSkill || !newSkill) {
+      return res
+        .status(400)
+        .json({ message: "Both old and new skills are required." });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const skillIndex = user.skills.indexOf(oldSkill);
+    if (skillIndex === -1) {
+      return res.status(404).json({ message: "Skill not found." });
+    }
+
+    user.skills[skillIndex] = newSkill;
+    await user.save();
+
+    res.json({ success: true, data: user.skills });
+  } catch (error) {
+    console.error("Error in updateSkill:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ✅ Delete a Skill
+export const deleteSkill = async (req, res) => {
+  try {
+    const { skill } = req.body;
+
+    if (!skill) {
+      return res.status(400).json({ message: "Skill is required." });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const skillIndex = user.skills.indexOf(skill);
+    if (skillIndex === -1) {
+      return res.status(404).json({ message: "Skill not found." });
+    }
+
+    user.skills.splice(skillIndex, 1);
+    await user.save();
+
+    res.json({ success: true, data: user.skills });
+  } catch (error) {
+    console.error("Error in deleteSkill:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ------------------------------------------------------------
+
+// export const getUserReport = async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+//     console.log(userId, "UUSSSEERRR-IIDD");
+
+//     const totalPosts = await Post.countDocuments({ author: userId });
+
+//     const userPosts = await Post.find({ author: userId });
+//     const totalComments = userPosts.reduce(
+//       (sum, post) => sum + post.comments.length,
+//       0
+//     );
+
+//     const totalShares = await Post.countDocuments({
+//       sharedPost: { $ne: null },
+//       author: userId,
+//     });
+
+//     const totalLikes = userPosts.reduce(
+//       (sum, post) => sum + post.likes.length,
+//       0
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         totalPosts,
+//         totalComments,
+//         totalShares,
+//         totalLikes,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in getUserReport controller:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 export const getUserReport = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -240,6 +466,9 @@ export const getUserReport = async (req, res) => {
       0
     );
 
+    const totalEvents = await Event.countDocuments();
+    const userEvents = await Event.countDocuments({ author: userId });
+
     res.status(200).json({
       success: true,
       data: {
@@ -247,6 +476,8 @@ export const getUserReport = async (req, res) => {
         totalComments,
         totalShares,
         totalLikes,
+        totalEvents,
+        userEvents,
       },
     });
   } catch (error) {
