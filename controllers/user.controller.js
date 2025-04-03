@@ -429,6 +429,9 @@ export const deleteSkill = async (req, res) => {
 //       0
 //     );
 
+//     const totalEvents = await Event.countDocuments();
+//     const userEvents = await Event.countDocuments({ author: userId });
+
 //     res.status(200).json({
 //       success: true,
 //       data: {
@@ -436,6 +439,8 @@ export const deleteSkill = async (req, res) => {
 //         totalComments,
 //         totalShares,
 //         totalLikes,
+//         totalEvents,
+//         userEvents,
 //       },
 //     });
 //   } catch (error) {
@@ -448,26 +453,40 @@ export const getUserReport = async (req, res) => {
     const userId = req.user._id;
     console.log(userId, "UUSSSEERRR-IIDD");
 
+    // 🟢 Total Posts & Related Stats
     const totalPosts = await Post.countDocuments({ author: userId });
-
     const userPosts = await Post.find({ author: userId });
     const totalComments = userPosts.reduce(
       (sum, post) => sum + post.comments.length,
       0
     );
-
     const totalShares = await Post.countDocuments({
       sharedPost: { $ne: null },
       author: userId,
     });
-
     const totalLikes = userPosts.reduce(
       (sum, post) => sum + post.likes.length,
       0
     );
 
+    // 🟢 Total Events & Related Stats
     const totalEvents = await Event.countDocuments();
     const userEvents = await Event.countDocuments({ author: userId });
+
+    // 🟢 Total Likes, Comments & Shares on Events
+    const allEvents = await Event.find();
+    const totalEventLikes = allEvents.reduce(
+      (sum, event) => sum + (event.likes ? event.likes.length : 0),
+      0
+    );
+    const totalEventComments = allEvents.reduce(
+      (sum, event) => sum + (event.comments ? event.comments.length : 0),
+      0
+    );
+    const totalEventShares = allEvents.reduce(
+      (sum, event) => sum + (event.shares ? event.shares.length : 0),
+      0
+    );
 
     res.status(200).json({
       success: true,
@@ -478,6 +497,9 @@ export const getUserReport = async (req, res) => {
         totalLikes,
         totalEvents,
         userEvents,
+        totalEventLikes,
+        totalEventComments,
+        totalEventShares,
       },
     });
   } catch (error) {
