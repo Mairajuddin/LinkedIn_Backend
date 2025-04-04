@@ -125,6 +125,25 @@ export const deleteEvent = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+//----------------------------------------------DEELTE ALL EVENT
+export const deleteAllEvents = async (req, res) => {
+  try {
+    // ✅ Only allow admin to delete all events
+    if (req.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete all events" });
+    }
+
+    // Delete all events from the collection
+    await Event.deleteMany({});
+
+    res.status(200).json({ message: "All events deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting all events:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const likeEvent = async (req, res) => {
   try {

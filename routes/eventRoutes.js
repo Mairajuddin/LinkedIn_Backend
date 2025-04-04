@@ -3,6 +3,7 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   createEvent,
   createEventComment,
+  deleteAllEvents,
   deleteEvent,
   getAllEvents,
   likeEvent,
@@ -17,6 +18,7 @@ router.post("/", protectRoute, getAllEvents); //post sy get kia hy
 
 router.post("/create", protectRoute, createEvent);
 router.put("/:eventId", protectRoute, updateEvent);
+router.delete("/deleteAll", protectRoute, deleteAllEvents);
 
 router.delete("/delete/:eventId", protectRoute, deleteEvent);
 router.post("/:eventId/like", protectRoute, likeEvent);

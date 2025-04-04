@@ -7,6 +7,9 @@ import { readMultiple, readSingle } from "../database/dbFunctions.js";
 import { HTTP_STATUS } from "../services/constants.js";
 import Post from "../models/post.model.js";
 import Event from "../models/eventModel.js";
+import ConnectionRequest from "../models/connectionRequest.model.js";
+import Notification from "../models/notification.model.js";
+import { Message } from "../models/chattingModel.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -218,6 +221,54 @@ export const assignHeadUser = async (req, res) => {
     res.json({ success: true, message: "User assigned as head user", user });
   } catch (error) {
     console.error("Error assigning head user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteUserCompletely = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Only allow admin or the user themselves to delete the account
+    if (req.user.role !== "admin" && req.user._id.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this user" });
+    }
+
+    // Remove the user from other users' connection lists
+    await User.updateMany(
+      { connections: userId },
+      { $pull: { connections: userId } }
+    );
+
+    // Delete all connection requests related to the user
+    await ConnectionRequest.deleteMany({
+      $or: [{ sender: userId }, { recipient: userId }],
+    });
+
+    // Delete all events created by the user
+    await Event.deleteMany({ createdBy: userId });
+
+    // Delete all messages sent by the user
+    await Message.deleteMany({ sender: userId });
+
+    // Delete all notifications related to the user
+    await Notification.deleteMany({ relatedUser: userId });
+
+    // Finally, delete the user from the database
+    await User.findByIdAndDelete(userId);
+
+    res
+      .status(200)
+      .json({ message: "User deleted successfully from all records" });
+  } catch (error) {
+    console.error("Error deleting user completely:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   approveCertification,
   assignHeadUser,
+  deleteUserCompletely,
   getAllUsers,
   getPendingCertifications,
   getUserReportByAdmin,
@@ -56,6 +57,7 @@ adminRouter.put(
   },
   assignHeadUser
 );
+adminRouter.delete("/delete/:userId", protectRoute, deleteUserCompletely);
 
 // getUserReportByAdmin
 export default adminRouter;
