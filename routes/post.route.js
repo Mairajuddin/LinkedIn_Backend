@@ -16,7 +16,7 @@ const router = express.Router();
 router.post("/", protectRoute, getFeedPosts); // just for now  i have get post by using post method
 router.post("/create", protectRoute, createPost);
 router.delete("/delete/:id", protectRoute, deletePost);
-router.get("/:id", protectRoute, getPostById);
+router.get("/:userId", protectRoute, getPostById);
 router.post("/:id/comment", protectRoute, createComment);
 router.put("/:postId/comments/:commentId", protectRoute, updateComment);
 
