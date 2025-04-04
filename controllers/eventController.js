@@ -101,8 +101,8 @@ export const updateEvent = async (req, res) => {
 // ✅ Delete an Event
 export const deleteEvent = async (req, res) => {
   try {
-    const { id } = req.params;
-    const event = await Event.findById(id);
+    const { eventId } = req.params;
+    const event = await Event.findById(eventId);
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -118,7 +118,7 @@ export const deleteEvent = async (req, res) => {
         .json({ message: "Not authorized to delete this event" });
     }
 
-    await Event.findByIdAndDelete(id);
+    await Event.findByIdAndDelete(eventId);
     res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
     console.error("Error deleting event:", error);

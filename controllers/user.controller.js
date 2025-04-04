@@ -3,22 +3,83 @@ import cloudinary from "../lib/cloudinary.js";
 import mongoose from "mongoose";
 import Post from "../models/post.model.js";
 import Event from "../models/eventModel.js";
+import ConnectionRequest from "../models/connectionRequest.model.js";
+
+// export const getSuggestedConnections = async (req, res) => {
+//   try {
+//     const currentUser = await User.findById(req.user._id).select("connections");
+
+//     // find users who are not already connected, and also do not recommend our own profile!! right?
+//     const suggestedUser = await User.find({
+//       _id: {
+//         $ne: req.user._id,
+//         $nin: currentUser.connections,
+//       },
+//     })
+//       .select("name username profilePicture headline")
+//       .limit(3);
+
+//     res.json(suggestedUser);
+//   } catch (error) {
+//     console.error("Error in getSuggestedConnections controller:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 export const getSuggestedConnections = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.user._id).select("connections");
+    const currentUserId = req.user._id;
 
-    // find users who are not already connected, and also do not recommend our own profile!! right?
-    const suggestedUser = await User.find({
+    const currentUser = await User.findById(currentUserId).select(
+      "connections"
+    );
+
+    // Suggested users excluding self and already connected users
+    const suggestedUsers = await User.find({
       _id: {
-        $ne: req.user._id,
+        $ne: currentUserId,
         $nin: currentUser.connections,
       },
     })
       .select("name username profilePicture headline")
-      .limit(3);
+      .limit(10);
 
-    res.json(suggestedUser);
+    // Fetch all connection requests involving the current user
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ sender: currentUserId }, { recipient: currentUserId }],
+    });
+
+    // Map userId => status
+    const requestMap = {};
+
+    connectionRequests.forEach((req) => {
+      const otherUserId = req.sender.equals(currentUserId)
+        ? req.recipient.toString()
+        : req.sender.toString();
+
+      if (req.status === "pending") {
+        requestMap[otherUserId] = req.sender.equals(currentUserId)
+          ? "pending"
+          : "received";
+      } else if (req.status === "rejected") {
+        requestMap[otherUserId] = "rejected";
+      }
+    });
+
+    // Final suggestions with connection status
+    const suggestionsWithStatus = suggestedUsers.map((user) => {
+      const status = requestMap[user._id.toString()] || "not_connected";
+      return {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        profilePicture: user.profilePicture,
+        headline: user.headline,
+        status,
+      };
+    });
+
+    res.json(suggestionsWithStatus);
   } catch (error) {
     console.error("Error in getSuggestedConnections controller:", error);
     res.status(500).json({ message: "Server error" });
@@ -452,8 +513,12 @@ export const getUserReport = async (req, res) => {
   try {
     const userId = req.user._id;
     console.log(userId, "UUSSSEERRR-IIDD");
+    const userProfile = await User.findById(userId);
+    console.log(userProfile, "UUSSSEERRR-PROFILE");
+    if (!userProfile) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    // 🟢 Total Posts & Related Stats
     const totalPosts = await Post.countDocuments({ author: userId });
     const userPosts = await Post.find({ author: userId });
     const totalComments = userPosts.reduce(
@@ -469,11 +534,9 @@ export const getUserReport = async (req, res) => {
       0
     );
 
-    // 🟢 Total Events & Related Stats
     const totalEvents = await Event.countDocuments();
     const userEvents = await Event.countDocuments({ author: userId });
 
-    // 🟢 Total Likes, Comments & Shares on Events
     const allEvents = await Event.find();
     const totalEventLikes = allEvents.reduce(
       (sum, event) => sum + (event.likes ? event.likes.length : 0),
@@ -490,6 +553,8 @@ export const getUserReport = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      user: userProfile,
+
       data: {
         totalPosts,
         totalComments,
