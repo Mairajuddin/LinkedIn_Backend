@@ -45,10 +45,6 @@ export const accessChat = asyncHandler(async (req, res) => {
   }
 });
 
-// ✅ Fetch User's Chats
-// ✅ Fetch User's Chats
-// ✅ Fetch User's Chats
-// ✅ Fetch User's Chats
 export const fetchChats = asyncHandler(async (req, res) => {
   try {
     let chats = await Chat.find({ participants: req.user._id })
