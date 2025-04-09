@@ -153,7 +153,8 @@ export const updateProfile = async (req, res) => {
 
 export const addCertification = async (req, res) => {
   try {
-    const { title, institute, startDate, endDate, description } = req.body;
+    const { title, institute, startDate, endDate, description, file } =
+      req.body;
 
     if (!title || !institute || !startDate || !endDate || !description) {
       return res.status(400).json({
@@ -163,12 +164,20 @@ export const addCertification = async (req, res) => {
     }
 
     const user = await User.findById(req.user._id);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Create a new certification object
+    let fileUrl = "";
+
+    if (file) {
+      const uploadResult = await cloudinary.uploader.upload(file, {
+        folder: "certifications",
+        resource_type: "auto",
+      });
+      fileUrl = uploadResult.secure_url;
+    }
+
     const newCertification = {
       _id: new mongoose.Types.ObjectId(),
       title,
@@ -176,20 +185,61 @@ export const addCertification = async (req, res) => {
       startDate,
       endDate,
       description,
-      file: "", // Assuming no file upload initially
+      file: fileUrl,
     };
 
     user.certifications.push(newCertification);
-    // user.isVerified = true;
-
     await user.save();
 
-    res.json({ success: true, data: user.certifications });
+    res.status(201).json({
+      success: true,
+      message: "Certification added successfully",
+      data: user.certifications,
+    });
   } catch (error) {
     console.error("Error in addCertification:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// export const addCertification = async (req, res) => {
+//   try {
+//     const { title, institute, startDate, endDate, description } = req.body;
+
+//     if (!title || !institute || !startDate || !endDate || !description) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "All certification fields are required.",
+//       });
+//     }
+
+//     const user = await User.findById(req.user._id);
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Create a new certification object
+//     const newCertification = {
+//       _id: new mongoose.Types.ObjectId(),
+//       title,
+//       institute,
+//       startDate,
+//       endDate,
+//       description,
+//       file: "", // Assuming no file upload initially
+//     };
+
+//     user.certifications.push(newCertification);
+//     // user.isVerified = true;
+
+//     await user.save();
+
+//     res.json({ success: true, data: user.certifications });
+//   } catch (error) {
+//     console.error("Error in addCertification:", error);
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// };
 
 export const addExperience = async (req, res) => {
   try {

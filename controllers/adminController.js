@@ -32,7 +32,7 @@ export const getAllUsers = async (req, res) => {
 export const getPendingCertifications = async (req, res) => {
   try {
     const users = await User.find({ "certifications.isVerified": false })
-      .select("name email certifications")
+      .select("name email certifications skills")
       .sort({ createdAt: -1 }); // 🟢 Sort by latest users first
 
     res.json({ success: true, users });
