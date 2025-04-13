@@ -1,12 +1,15 @@
 import { Router } from "express";
 import {
   approveCertification,
+  approveSkill,
   assignHeadUser,
   deleteUserCompletely,
   getAllUsers,
   getPendingCertifications,
   getUserReportByAdmin,
+  getUsersWithSkills,
   rejectCertification,
+  rejectSkill,
 } from "../controllers/adminController.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -42,7 +45,27 @@ adminRouter.put(
   },
   rejectCertification
 );
-
+adminRouter.get(
+  "/skills/pending",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["admin"]);
+  },
+  getUsersWithSkills
+);
+adminRouter.put(
+  "/skills/approve/:userId/:skillId",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["admin"]);
+  },
+  approveSkill
+);
+adminRouter.put(
+  "/skills/reject/:userId/:skillId",
+  (req, res, next) => {
+    protectRoute(req, res, next, ["admin"]);
+  },
+  rejectSkill
+);
 adminRouter.get(
   "/user-report/:userId",
   (req, res, next) => {
