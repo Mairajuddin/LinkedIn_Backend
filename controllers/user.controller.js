@@ -5,27 +5,6 @@ import Post from "../models/post.model.js";
 import Event from "../models/eventModel.js";
 import ConnectionRequest from "../models/connectionRequest.model.js";
 
-// export const getSuggestedConnections = async (req, res) => {
-//   try {
-//     const currentUser = await User.findById(req.user._id).select("connections");
-
-//     // find users who are not already connected, and also do not recommend our own profile!! right?
-//     const suggestedUser = await User.find({
-//       _id: {
-//         $ne: req.user._id,
-//         $nin: currentUser.connections,
-//       },
-//     })
-//       .select("name username profilePicture headline")
-//       .limit(3);
-
-//     res.json(suggestedUser);
-//   } catch (error) {
-//     console.error("Error in getSuggestedConnections controller:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
-
 export const getSuggestedConnections = async (req, res) => {
   try {
     const currentUserId = req.user._id;
@@ -150,6 +129,20 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("-password");
+    console.log(req.params.userId, "USER-ID-GET-BY-ID");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error in getUserById controller:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 export const addCertification = async (req, res) => {
   try {
@@ -201,45 +194,6 @@ export const addCertification = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-// export const addCertification = async (req, res) => {
-//   try {
-//     const { title, institute, startDate, endDate, description } = req.body;
-
-//     if (!title || !institute || !startDate || !endDate || !description) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "All certification fields are required.",
-//       });
-//     }
-
-//     const user = await User.findById(req.user._id);
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Create a new certification object
-//     const newCertification = {
-//       _id: new mongoose.Types.ObjectId(),
-//       title,
-//       institute,
-//       startDate,
-//       endDate,
-//       description,
-//       file: "", // Assuming no file upload initially
-//     };
-
-//     user.certifications.push(newCertification);
-//     // user.isVerified = true;
-
-//     await user.save();
-
-//     res.json({ success: true, data: user.certifications });
-//   } catch (error) {
-//     console.error("Error in addCertification:", error);
-//     res.status(500).json({ message: "Server error", error: error.message });
-//   }
-// };
 
 export const addExperience = async (req, res) => {
   try {
@@ -546,50 +500,6 @@ export const deleteSkill = async (req, res) => {
   }
 };
 
-// ------------------------------------------------------------
-
-// export const getUserReport = async (req, res) => {
-//   try {
-//     const userId = req.user._id;
-//     console.log(userId, "UUSSSEERRR-IIDD");
-
-//     const totalPosts = await Post.countDocuments({ author: userId });
-
-//     const userPosts = await Post.find({ author: userId });
-//     const totalComments = userPosts.reduce(
-//       (sum, post) => sum + post.comments.length,
-//       0
-//     );
-
-//     const totalShares = await Post.countDocuments({
-//       sharedPost: { $ne: null },
-//       author: userId,
-//     });
-
-//     const totalLikes = userPosts.reduce(
-//       (sum, post) => sum + post.likes.length,
-//       0
-//     );
-
-//     const totalEvents = await Event.countDocuments();
-//     const userEvents = await Event.countDocuments({ author: userId });
-
-//     res.status(200).json({
-//       success: true,
-//       data: {
-//         totalPosts,
-//         totalComments,
-//         totalShares,
-//         totalLikes,
-//         totalEvents,
-//         userEvents,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error in getUserReport controller:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 export const getUserReport = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -652,6 +562,21 @@ export const getUserReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in getUserReport controller:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchUsers = async (req, res) => {
+  const query = req.query.q;
+
+  try {
+    const users = await User.find({
+      username: { $regex: "^" + query, $options: "i" }, // case-insensitive, starts with
+    }).select("username _id"); // only return username and _id
+
+    res.json(users);
+  } catch (error) {
+    console.error("Error in searchUsers controller:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
