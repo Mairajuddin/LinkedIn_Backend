@@ -32,6 +32,8 @@ import {
   addSkill,
   updateSkill,
   deleteSkill,
+  searchUsers,
+  getUserById,
 } from "../controllers/user.controller.js";
 import multer from "multer";
 import path from "path";
@@ -41,6 +43,7 @@ const router = express.Router();
 
 router.get("/suggestions", protectRoute, getSuggestedConnections);
 router.get("/:username", protectRoute, getPublicProfile);
+router.post("/:userId", protectRoute, getUserById); //i use post for get user
 
 router.put(
   "/update-profile",
@@ -67,6 +70,7 @@ router.get("/skills", protectRoute, getSkills); // ✅ Get all skills
 router.post("/skills", protectRoute, addSkill); // ✅ Add a skill
 router.put("/skills", protectRoute, updateSkill); // ✅ Update a skill
 router.delete("/skills", protectRoute, deleteSkill); // ✅ Delete a skill
+router.post("/search-users", searchUsers);
 
 router.post(
   "/my-report",
